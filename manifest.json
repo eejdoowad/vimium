@@ -54,9 +54,11 @@
              "content_scripts/mode_key_handler.js",
              "content_scripts/mode_visual.js",
              "content_scripts/hud.js",
-             "content_scripts/vimium_frontend.js"
+             "content_scripts/vimium_frontend.js",
+             "content_scripts/voice_prompt.js"
             ],
-      "css": ["content_scripts/vimium.css"],
+      "css": ["content_scripts/vimium.css",
+              "content_scripts/voice_prompt.css"],
       "run_at": "document_start",
       "all_frames": true
     },

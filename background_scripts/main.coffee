@@ -68,7 +68,17 @@ chrome.runtime.onConnect.addListener (port) ->
     port.onMessage.addListener portHandlers[port.name] port.sender, port
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) ->
-  request = extend {count: 1, frameId: sender.frameId}, extend request, tab: sender.tab, tabId: sender.tab.id
+
+  # these are populated by listener for commands
+  # send from listener tab
+  unless request.voiceCommand?
+    request = extend request,
+      count: 1
+      frameId: sender.frameId
+      tab: sender.tab
+      tabId: sender.tab.id
+
+
   if (sendRequestHandlers[request.handler])
     sendResponse(sendRequestHandlers[request.handler](request, sender))
   # Ensure the sendResponse callback is freed.
@@ -444,7 +454,7 @@ sendRequestHandlers =
   createMark: Marks.create.bind(Marks)
   gotoMark: Marks.goto.bind(Marks)
   # Send a message to all frames in the current tab.
-  sendMessageToFrames: (request, sender) -> chrome.tabs.sendMessage sender.tab.id, request.message
+  sendMessageToFrames: (request, sender) -> chrome.tabs.sendMessage request.tab.id, request.message
   # For debugging only. This allows content scripts to log messages to the extension's logging page.
   log: ({frameId, message}, sender) -> BgUtils.log "#{frameId} #{message}", sender
 

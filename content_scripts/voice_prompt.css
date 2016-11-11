@@ -1,0 +1,19 @@
+#voice_messages {
+  position: fixed;
+  max-width: 200px;
+  right: 0px;
+  top: 0px;
+  z-index: 99999; /* high number to make sure it isn't covered up */
+  display: inline-block;
+  padding: 0px 0px;
+}
+
+.voice_message {
+  display: block;
+  margin-right: 10px;
+  margin-top: 4px;
+  background-color: dodgerblue;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 10px;
+}

@@ -167,6 +167,7 @@ initializePreDomReady = ->
 
   chrome.runtime.onMessage.addListener (request, sender, sendResponse) ->
     # These requests are intended for the background page, but they're delivered to the options page too.
+    return false if request.msg? || request?.voiceCommand
     unless request.handler and not request.name
       if isEnabledForUrl or request.name in ["checkEnabledAfterURLChange", "runInTopFrame"]
         requestHandlers[request.name] request, sender, sendResponse
@@ -309,8 +310,8 @@ extend window,
   scrollToRight: -> Scroller.scrollTo "x", "max"
   scrollUp: (count) -> Scroller.scrollBy "y", -1 * Settings.get("scrollStepSize") * count
   scrollDown: (count) -> Scroller.scrollBy "y", Settings.get("scrollStepSize") * count
-  scrollPageUp: (count) -> Scroller.scrollBy "y", "viewSize", -1/2 * count
-  scrollPageDown: (count) -> Scroller.scrollBy "y", "viewSize", 1/2 * count
+  scrollPageUp: (count) -> Scroller.scrollBy "y", "viewSize", -1 / 2 * count
+  scrollPageDown: (count) -> Scroller.scrollBy "y", "viewSize", 1 / 2 * count
   scrollFullPageUp: (count) -> Scroller.scrollBy "y", "viewSize", -1 * count
   scrollFullPageDown: (count) -> Scroller.scrollBy "y", "viewSize", 1 * count
   scrollLeft: (count) -> Scroller.scrollBy "x", -1 * Settings.get("scrollStepSize") * count
