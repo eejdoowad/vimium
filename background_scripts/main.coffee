@@ -206,6 +206,9 @@ mkRepeatCommand = (command) -> (request) ->
 # These are commands which are bound to keystrokes which must be handled by the background page. They are
 # mapped in commands.coffee.
 BackgroundCommands =
+  search: mkRepeatCommand (request, callback) ->
+    request.url = "https://www.bing.com/"
+    TabOperations.openUrlInNewTab request, (tab) -> callback extend request, {tab, tabId: tab.id}
   createTab: mkRepeatCommand (request, callback) ->
     request.url ?= do ->
       url = Settings.get "newTabUrl"

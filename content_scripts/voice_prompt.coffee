@@ -23,6 +23,8 @@ chrome.runtime.onMessage.addListener (request, sender, sendResponse) ->
       type_letters(request.letters)
     else if request.registryEntry.command == "activateLinkHint"
       activateLinkHint(request.matchString)
+    else if request.registryEntry.command == "tryLink"
+      tryLink(request.matchString)
     else
       Utils.invokeCommandString request.registryEntry.command, request.count
 
@@ -41,6 +43,13 @@ window.runEscape = ->
 # does nothing
 window.noop = ->
 
+window.tryLink = (matchString) ->
+  matchString = matchString.trim().toLowerCase()
+  hintMarkers = HintCoordinator.linkHintsMode.hintMarkers
+  for marker in hintMarkers
+    if marker.linkText.toLowerCase().indexOf(matchString) != -1
+      HintCoordinator.linkHintsMode.activateLink marker, false
+      return
 
 window.activateLinkHint = (matchString) ->
   hintMarkers = HintCoordinator.linkHintsMode.hintMarkers

@@ -17,7 +17,7 @@ promptMessage = (msg, phrases) ->
 
 
 validCommand = (msg) ->
-  return msg of voiceToCommandMap || msg.split(" ")[0] in commandVoiceTriggers.type || msg.split(" ")[0] in commandVoiceTriggers.activateLinkHint
+  return msg of voiceToCommandMap || msg.split(" ")[0] in commandVoiceTriggers.type || msg.split(" ")[0] in (commandVoiceTriggers.activateLinkHint.concat commandVoiceTriggers.tryLink)
 
 sendCommand = (msg, tab) ->
   return unless validCommand msg
@@ -31,6 +31,8 @@ sendCommand = (msg, tab) ->
         "type"
       else if word1 in commandVoiceTriggers.activateLinkHint
         "activateLinkHint"
+      else if word1 in commandVoiceTriggers.tryLink
+        "tryLink"
       else
         "noop" 
 
@@ -84,12 +86,24 @@ sendCommand = (msg, tab) ->
       # frameID: ?
     if command == "type"
       request["letters"] = msg.substr ((msg.indexOf " ") + 1)
-    else if command == "activateLinkHint"
+    else if command == "activateLinkHint" || command == "tryLink"
       request["matchString"] = msg.substr ((msg.indexOf " ") + 1)
-    chrome.tabs.sendMessage tab.id, request
+    
+    # MONKEY PATCHING for trylink
+    if  command == "tryLink"
+      # first activate link hints
+      registryEntry.command = "LinkHints.activateMode"
+      chrome.tabs.sendMessage tab.id, request
+      registryEntry.command = "tryLink"
+      # then activate link, but not immediately (allow link hints to activate first)
+      f = () -> chrome.tabs.sendMessage tab.id, request
+      setTimeout(f, 0)
+
+    # default behavior for everything else
+    else
+      chrome.tabs.sendMessage tab.id, request
 
 if annyang
-
   annyang.addCommands {"*msg": ->}
   annyang.addCallback "resultMatch", (userSaid, commandText, phrases)->
     userSaid = userSaid.toLowerCase()
@@ -108,6 +122,8 @@ if annyang
   annyang.start();
 
 commandVoiceTriggers = 
+  tryLink: ["try", "tri", "trike", "tribe"]
+  search: ["search"]
   noop: ["nothing", "noop"]
   runEscape: ["escape", "oops", "oopsie"]
   type: ["type", "hey", "hi"]
@@ -213,6 +229,8 @@ for command, triggers of commandVoiceTriggers
 
 
 commandDescriptions =
+  tryLink: ["Activates link hints and tries one"]
+  search: ["Opens the search page", { background: true }]
   noop: ["Does nothing"]
   runEscape: ["Simulates Escape key press"]
   type: ["Types what the user says to"]
