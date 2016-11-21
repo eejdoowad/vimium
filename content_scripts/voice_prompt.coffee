@@ -47,7 +47,7 @@ window.tryLink = (matchString) ->
   matchString = matchString.trim().toLowerCase()
   hintMarkers = HintCoordinator.linkHintsMode.hintMarkers
   for marker in hintMarkers
-    if marker.linkText.toLowerCase().indexOf(matchString) != -1
+    if marker.linkText? && marker.linkText.toLowerCase().indexOf(matchString) != -1
       HintCoordinator.linkHintsMode.activateLink marker, false
       return
 
